@@ -1,11 +1,13 @@
 package com.example.wifiaccess
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.net.wifi.ScanResult
+import android.util.Log
 
 
 class BroadcastWifi (context: Context){
@@ -35,10 +37,14 @@ class BroadcastWifi (context: Context){
             scanFailure()
         }
     }
+
     fun scanSuccess(){
         val result = wifiManager.scanResults
+        Log.d("Resultado",result.toString())
     }
+
     fun scanFailure(){
         val result = wifiManager.scanResults
+        Log.d("Resultado Fallido",result.toString())
     }
 }

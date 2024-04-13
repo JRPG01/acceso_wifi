@@ -1,17 +1,18 @@
 package com.example.wifiaccess
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.net.wifi.ScanResult
+import android.os.Handler
 import android.util.Log
 
 
-class BroadcastWifi (context: Context){
+class BroadcastWifi(context: Context, val scanFinished: (List<ScanResult>) -> Unit) {
     var wifiManager: WifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+    private val _scanResults = mutableListOf<ScanResult>()
 
     val wifiManagerReceiver = object : BroadcastReceiver(){
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -39,10 +40,17 @@ class BroadcastWifi (context: Context){
     }
 
     fun scanSuccess(){
-        val result = wifiManager.scanResults
-        Log.d("Resultado",result.toString())
-    }
+        _scanResults.clear()
+        _scanResults.addAll(wifiManager.scanResults)
+        Log.d("Escaneo de red", "Escaneo exitoso: ${_scanResults.size} redes encontradas")
 
+        // Ejecutar scanFinished en el hilo principal
+        val handler = Handler()
+        handler.post {
+            scanFinished(_scanResults)
+        }
+    }
+    fun getScanResults(): List<ScanResult> = _scanResults
     fun scanFailure(){
         val result = wifiManager.scanResults
         Log.d("Resultado Fallido",result.toString())
